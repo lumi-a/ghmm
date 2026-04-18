@@ -10,7 +10,7 @@ export interface CameraRig {
   setAspect(beliefAspect: number, tokenAspect: number): void;
 }
 
-export function setupCamera(domElement: HTMLCanvasElement): CameraRig {
+export function setupCamera(domElement: HTMLElement): CameraRig {
   const master = new THREE.PerspectiveCamera(60, 1, 0.01, 100);
   master.position.set(0, 0, 5);
 

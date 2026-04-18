@@ -13,7 +13,7 @@ body { background: var(--bg); color: var(--text); font: 13px/1.4 monospace; over
 
 #app { display: flex; height: 100vh; width: 100vw; }
 
-#viewports { flex: 1; display: flex; min-width: 0; }
+#viewports { flex: 1; display: flex; min-width: 0; touch-action: none; }
 
 .viewport { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); }
 

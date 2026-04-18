@@ -46,7 +46,7 @@ let lastInitial: number[] | null = null;
 // ── Scenes & camera ───────────────────────────────────────────────────────────
 const beliefScene = createScene(canvasBelief);
 const tokenScene = createScene(canvasToken);
-const cam = setupCamera(canvasBelief);
+const cam = setupCamera(document.getElementById('viewports') as HTMLElement);
 
 // ── Presets ───────────────────────────────────────────────────────────────────
 PRESETS.forEach((preset, idx) => {

@@ -122,11 +122,6 @@ function refreshWidget(el: HTMLElement, decl: WidgetDecl, state: WidgetState) {
       const valSpan = el.querySelector<HTMLSpanElement>('.widget-value');
       if (valSpan) valSpan.textContent = fmtNum(Number(v));
     }
-    const btn = el.querySelector<HTMLButtonElement>('.play-btn');
-    if (btn) {
-      btn.textContent = isPlaying(decl.name) ? '⏹' : '▶';
-      btn.classList.toggle('playing', isPlaying(decl.name));
-    }
   }
 }
 
