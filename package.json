@@ -1,21 +1,23 @@
 {
-  "name": "GHHN",
+  "name": "ghhn",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.ts",
+  "type": "module",
   "scripts": {
-    "start": "webpack serve --open"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
-    "typescript": "^6.0.0"
+    "codemirror": "^6.0.1",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "ml-matrix": "^6.12.0",
+    "three": "^0.171.0"
   },
   "devDependencies": {
-    "ts-loader": "^9.5.7",
-    "webpack": "^5.106.2",
-    "webpack-cli": "^7.0.2",
-    "webpack-dev-server": "^5.2.3"
+    "@types/three": "^0.171.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.0"
   }
 }
