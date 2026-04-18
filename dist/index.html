@@ -1,14 +1,52 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HMM Belief State Visualizer</title>
+    <script type="module" crossorigin src="/ghhn/assets/index-DCj3eMYk.js"></script>
+    <link rel="modulepreload" crossorigin href="/ghhn/assets/codemirror-eDqrS3eU.js">
+    <link rel="modulepreload" crossorigin href="/ghhn/assets/mlmatrix-C-p6w7n8.js">
+    <link rel="modulepreload" crossorigin href="/ghhn/assets/three-C5wVrlxt.js">
+    <link rel="stylesheet" crossorigin href="/ghhn/assets/index-3bPf2NmH.css">
+  </head>
+  <body>
+    <div id="app">
+      <div id="viewports">
+        <div class="viewport" id="vp-belief">
+          <div class="vp-header">
+            Belief states
+            <span class="dim-badge" id="dim-belief"></span>
+          </div>
+          <div class="vp-body">
+            <canvas id="canvas-belief"></canvas>
+            <div class="labels" id="labels-belief"></div>
+          </div>
+        </div>
+        <div class="viewport" id="vp-token">
+          <div class="vp-header">
+            Next-token predictions
+            <span class="dim-badge" id="dim-token"></span>
+          </div>
+          <div class="vp-body">
+            <canvas id="canvas-token"></canvas>
+            <div class="labels" id="labels-token"></div>
+          </div>
+        </div>
+      </div>
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>TEMPLATE</title>
-</head>
-
-<body>
-  <script src="main.js"></script>
-</body>
-
+      <aside id="sidebar">
+        <div id="preset-bar">
+          <label for="preset-select">Preset</label>
+          <select id="preset-select"></select>
+        </div>
+        <div id="editor-wrap"></div>
+        <div id="widgets-wrap"></div>
+        <div id="status-wrap">
+          <div id="status-badge" class="badge badge-hmm" title="">HMM</div>
+        </div>
+        <div id="error-wrap"></div>
+      </aside>
+    </div>
+  </body>
 </html>
