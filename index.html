@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HMM Belief State Visualizer</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="viewports">
+        <div class="viewport" id="vp-belief">
+          <div class="vp-header">
+            Belief states
+            <span class="dim-badge" id="dim-belief"></span>
+          </div>
+          <div class="vp-body">
+            <canvas id="canvas-belief"></canvas>
+            <div class="labels" id="labels-belief"></div>
+          </div>
+        </div>
+        <div class="viewport" id="vp-token">
+          <div class="vp-header">
+            Next-token predictions
+            <span class="dim-badge" id="dim-token"></span>
+          </div>
+          <div class="vp-body">
+            <canvas id="canvas-token"></canvas>
+            <div class="labels" id="labels-token"></div>
+          </div>
+        </div>
+      </div>
+
+      <aside id="sidebar">
+        <div id="preset-bar">
+          <label for="preset-select">Preset</label>
+          <select id="preset-select"></select>
+        </div>
+        <div id="editor-wrap"></div>
+        <div id="widgets-wrap"></div>
+        <div id="status-wrap">
+          <div id="status-badge" class="badge badge-hmm" title="">HMM</div>
+        </div>
+        <div id="error-wrap"></div>
+      </aside>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
