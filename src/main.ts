@@ -9,7 +9,7 @@ import { advanceAnimations } from "./widgets/animation.js";
 import { computePhi, sumT, isRowStochastic, Issue } from "./model/phi.js";
 import { effectiveDim } from "./model/dims.js";
 import { getVertices } from "./model/projection.js";
-import { CloudStreamer } from "./model/stream.js";
+import { CloudStreamer, aggregate } from "./model/stream.js";
 import { createScene } from "./render/scene.js";
 import { setupCamera } from "./render/camera.js";
 import {
@@ -27,6 +27,7 @@ const presetSelect = document.getElementById(
 const editorWrap = document.getElementById("editor-wrap") as HTMLElement;
 const widgetsWrap = document.getElementById("widgets-wrap") as HTMLElement;
 const statusBadge = document.getElementById("status-badge") as HTMLElement;
+const tooltip = document.getElementById("badge-tooltip") as HTMLElement;
 const errorWrap = document.getElementById("error-wrap") as HTMLElement;
 const dimBeliefEl = document.getElementById("dim-belief") as HTMLElement;
 const dimTokenEl = document.getElementById("dim-token") as HTMLElement;
@@ -50,6 +51,7 @@ let lastT: number[][][] | null = null;
 let lastInitial: number[] | null = null;
 let lastIssues: Issue[] = [];
 let dimFrame = 0;
+let wasFull = false;
 
 // ── Scenes, camera, streamer ──────────────────────────────────────────────────
 const beliefScene = createScene(canvasBelief);
@@ -197,6 +199,7 @@ function runUpdate() {
 
   streamer.reset(T, initial, phi, beliefVerts, tokenVerts);
   dimFrame = 0;
+  wasFull = false;
 
   updateStatus(T, initial, issues, false);
   rebuildLabels(beliefVerts, labelsBelief, "s");
@@ -232,7 +235,7 @@ function updateStatus(
 
   statusBadge.textContent = label;
   statusBadge.className = `badge badge-${kind}`;
-  statusBadge.title = tip;
+  tooltip.textContent = tip;
 }
 
 function formatIssue(issue: Issue): string {
@@ -252,7 +255,7 @@ function showError(msg: string) {
   errorWrap.textContent = msg;
   statusBadge.className = "badge badge-ill-posed";
   statusBadge.textContent = "error";
-  statusBadge.title = msg;
+  tooltip.textContent = msg;
 }
 function clearError() {
   errorWrap.textContent = "";
@@ -334,19 +337,22 @@ function loop(now: number) {
 
   cam.sync();
 
-  // Tick the streamer — 50 pts/frame until buffer full, then stable
-  const added = streamer.tick(65535);
+  // Tick the streamer — time-budget based until buffer full, then stable
+  const added = streamer.tick(2);
   if (added) {
-    beliefScene.updatePoints(streamer.beliefBuf, streamer.count);
-    tokenScene.updatePoints(streamer.tokenBuf, streamer.count);
+    const bCloud = aggregate(streamer.beliefBuf, streamer.count);
+    const tCloud = aggregate(streamer.tokenBuf, streamer.count);
+    beliefScene.updatePoints(bCloud.positions, bCloud.alphas, bCloud.n);
+    tokenScene.updatePoints(tCloud.positions, tCloud.alphas, tCloud.n);
 
     // Update has-negative status lazily
     if (streamer.hasNegative && lastT && lastInitial)
       updateStatus(lastT, lastInitial, lastIssues, true);
 
-    // Recompute effective dim once per second
+    // Compute effective dim once when buffer fills
     dimFrame++;
-    if (dimFrame % 60 === 0) {
+    if (dimFrame % 60 === 0 || (streamer.full && !wasFull)) {
+      wasFull = streamer.full;
       updateDimBadges(
         effectiveDim(streamer.beliefBuf, streamer.count),
         effectiveDim(streamer.tokenBuf, streamer.count),

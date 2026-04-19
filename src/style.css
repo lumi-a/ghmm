@@ -143,6 +143,17 @@ body { background: var(--bg); color: var(--text); font: 13px/1.4 monospace; over
 #status-wrap {
   padding: 8px 10px;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.badge-tooltip {
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  line-height: 1.4;
+  min-height: 0;
 }
 
 #error-wrap {

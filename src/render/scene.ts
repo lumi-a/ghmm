@@ -3,11 +3,28 @@ import * as THREE from 'three';
 export interface SceneHandle {
   scene: THREE.Scene;
   renderer: THREE.WebGLRenderer;
-  updatePoints(buf: Float32Array, count: number): void;
+  updatePoints(positions: Float32Array, alphas: Float32Array, n: number): void;
   updateEdges(verts: number[][]): void;
   render(camera: THREE.Camera): void;
   resize(w: number, h: number): void;
 }
+
+const VERT = `
+attribute float aAlpha;
+varying float vAlpha;
+void main() {
+  vAlpha = aAlpha;
+  gl_PointSize = 2.0;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+const FRAG = `
+varying float vAlpha;
+void main() {
+  gl_FragColor = vec4(0.267, 0.533, 1.0, vAlpha);
+}
+`;
 
 export function createScene(canvas: HTMLCanvasElement): SceneHandle {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -16,14 +33,13 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
 
   const scene = new THREE.Scene();
 
-  // Points
+  // Points with per-vertex alpha via ShaderMaterial
   const pointsGeo = new THREE.BufferGeometry();
-  const pointsMat = new THREE.PointsMaterial({
-    size: 2,
-    sizeAttenuation: false,
-    color: 0x4488ff,
+  const pointsMat = new THREE.ShaderMaterial({
+    vertexShader: VERT,
+    fragmentShader: FRAG,
     transparent: true,
-    opacity: 0.5,
+    depthWrite: false,
   });
   const points = new THREE.Points(pointsGeo, pointsMat);
   scene.add(points);
@@ -35,14 +51,20 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
   scene.add(edges);
 
   let posAttr: THREE.BufferAttribute | null = null;
+  let alphaAttr: THREE.BufferAttribute | null = null;
 
-  function updatePoints(buf: Float32Array, count: number) {
-    if (!posAttr || posAttr.array !== buf) {
-      posAttr = new THREE.BufferAttribute(buf, 3);
+  function updatePoints(positions: Float32Array, alphas: Float32Array, n: number) {
+    if (!posAttr || posAttr.array !== positions) {
+      posAttr = new THREE.BufferAttribute(positions, 3);
       pointsGeo.setAttribute('position', posAttr);
     }
+    if (!alphaAttr || alphaAttr.array !== alphas) {
+      alphaAttr = new THREE.BufferAttribute(alphas, 1);
+      pointsGeo.setAttribute('aAlpha', alphaAttr);
+    }
     posAttr.needsUpdate = true;
-    pointsGeo.setDrawRange(0, count);
+    alphaAttr.needsUpdate = true;
+    pointsGeo.setDrawRange(0, n);
     pointsGeo.computeBoundingSphere();
   }
 
