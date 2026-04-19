@@ -20,6 +20,7 @@ export function setupCamera(domElement: HTMLElement): CameraRig {
   const controls = new OrbitControls(master, domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
+  controls.enableZoom = false; // zoom handled per-viewport via scroll/pinch
 
   function sync() {
     controls.update();

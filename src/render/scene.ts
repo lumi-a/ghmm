@@ -3,7 +3,8 @@ import * as THREE from 'three';
 export interface SceneHandle {
   scene: THREE.Scene;
   renderer: THREE.WebGLRenderer;
-  update(pts: [number, number, number][], verts: number[][]): void;
+  updatePoints(buf: Float32Array, count: number): void;
+  updateEdges(verts: number[][]): void;
   render(camera: THREE.Camera): void;
   resize(w: number, h: number): void;
 }
@@ -33,18 +34,19 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
   const edges = new THREE.LineSegments(edgesGeo, edgesMat);
   scene.add(edges);
 
-  function update(pts: [number, number, number][], verts: number[][]) {
-    // Update point cloud
-    const pos = new Float32Array(pts.length * 3);
-    for (let i = 0; i < pts.length; i++) {
-      pos[i * 3] = pts[i][0];
-      pos[i * 3 + 1] = pts[i][1];
-      pos[i * 3 + 2] = pts[i][2];
-    }
-    pointsGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    pointsGeo.computeBoundingSphere();
+  let posAttr: THREE.BufferAttribute | null = null;
 
-    // Update simplex edges (all pairs)
+  function updatePoints(buf: Float32Array, count: number) {
+    if (!posAttr || posAttr.array !== buf) {
+      posAttr = new THREE.BufferAttribute(buf, 3);
+      pointsGeo.setAttribute('position', posAttr);
+    }
+    posAttr.needsUpdate = true;
+    pointsGeo.setDrawRange(0, count);
+    pointsGeo.computeBoundingSphere();
+  }
+
+  function updateEdges(verts: number[][]) {
     const edgePos: number[] = [];
     const nv = verts.length;
     for (let i = 0; i < nv; i++)
@@ -64,5 +66,5 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     renderer.setSize(w, h, false);
   }
 
-  return { scene, renderer, update, render, resize };
+  return { scene, renderer, updatePoints, updateEdges, render, resize };
 }

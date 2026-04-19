@@ -19,14 +19,15 @@ export function syncWidgetUI(
     }
   }
 
-  // Add or update, then re-order
+  // Add new widgets; update existing ones in-place (no DOM moves — moving nodes swallows clicks)
   for (const decl of decls) {
     if (!elements.has(decl.name)) {
-      elements.set(decl.name, buildWidget(decl, state, onChange));
+      const el = buildWidget(decl, state, onChange);
+      elements.set(decl.name, el);
+      container.appendChild(el);
     } else {
       refreshWidget(elements.get(decl.name)!, decl, state);
     }
-    container.appendChild(elements.get(decl.name)!);
   }
 }
 

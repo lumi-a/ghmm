@@ -1,18 +1,19 @@
 import { Matrix, SingularValueDecomposition } from 'ml-matrix';
 
-export function effectiveDim(points: [number, number, number][]): number {
-  if (points.length < 2) return 0;
+export function effectiveDim(buf: Float32Array, count: number): number {
+  if (count < 2) return 0;
 
-  const n = points.length;
-  const mean = [0, 0, 0];
-  for (const p of points) {
-    mean[0] += p[0]; mean[1] += p[1]; mean[2] += p[2];
+  let mx = 0, my = 0, mz = 0;
+  for (let i = 0; i < count; i++) {
+    mx += buf[i * 3]; my += buf[i * 3 + 1]; mz += buf[i * 3 + 2];
   }
-  mean[0] /= n; mean[1] /= n; mean[2] /= n;
+  mx /= count; my /= count; mz /= count;
 
-  const centered = points.map(p => [p[0] - mean[0], p[1] - mean[1], p[2] - mean[2]]);
-  const mat = new Matrix(centered);
-  const svd = new SingularValueDecomposition(mat, { autoTranspose: true });
+  const rows: number[][] = new Array(count);
+  for (let i = 0; i < count; i++)
+    rows[i] = [buf[i * 3] - mx, buf[i * 3 + 1] - my, buf[i * 3 + 2] - mz];
+
+  const svd = new SingularValueDecomposition(new Matrix(rows), { autoTranspose: true });
   const sigmas = svd.diagonal;
   const maxSigma = Math.max(...sigmas);
   if (maxSigma < 1e-12) return 0;
