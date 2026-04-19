@@ -12,7 +12,7 @@ def calculate_probability(
     ws: Sequence[int],
     phi: npt.NDArray[np.float64] | None = None,
 ) -> float:
-    """Returns the probability of seeing observations ws[0],ws[1],... in the GHHM given
+    """Returns the probability of seeing observations ws[0],ws[1],... in the GHMM given
     by T and the initial distribution.
     T has shape (observation, previous_state, next_state).
     If phi is None, assumes a standard HMM.
