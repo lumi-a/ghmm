@@ -77,7 +77,7 @@ const initial = np.array([1/3, 1/3, 1/3]);
     name: "Mess4",
     code: `\
 // Mess4 — 4 states, 4 obs
-const x = slider('x', 0, 0.5, 0.15);
+const x = slider('x', 0, 1/3, 0.15);
 const a = slider('a', 0, 1, 0.2);
 const b = (1 - a) / 3;
 const y = 1 - 3 * x;
@@ -118,7 +118,6 @@ const initial = np.array([1/3, 1/3, 1/3]);
     code: `\
 // Fanizza — 4 states, 2 obs
 // GHMM. Quantum-inspired process with rotation in state space.
-// phi has negative entries — OOM with negative probabilities.
 const alpha = slider('α', 0.1, 3.14, 1.0);
 const lamb  = slider('λ', 0.01, 0.99, 0.5);
 const ca = Math.cos(alpha), sa = Math.sin(alpha);

@@ -36,8 +36,6 @@ const tooltip = document.getElementById("badge-tooltip") as HTMLElement;
 const errorWrap = document.getElementById("error-wrap") as HTMLElement;
 const dimBeliefEl = document.getElementById("dim-belief") as HTMLElement;
 const dimTokenEl = document.getElementById("dim-token") as HTMLElement;
-const labelsBelief = document.getElementById("labels-belief") as HTMLElement;
-const labelsToken = document.getElementById("labels-token") as HTMLElement;
 const canvasBelief = document.getElementById(
   "canvas-belief",
 ) as HTMLCanvasElement;
@@ -50,8 +48,6 @@ const widgetState = createWidgetState();
 let currentDecls: WidgetDecl[] = [];
 let currentSrc = "";
 let evalTimer: ReturnType<typeof setTimeout> | null = null;
-let lastBeliefVerts: number[][] | null = null;
-let lastTokenVerts: number[][] | null = null;
 
 // ── Scenes, camera, streamer ──────────────────────────────────────────────────
 const beliefScene = createScene(canvasBelief);
@@ -177,8 +173,6 @@ function runUpdate() {
     return;
   }
 
-  lastBeliefVerts = beliefVerts;
-  lastTokenVerts = tokenVerts;
 
   beliefScene.updateEdges(beliefVerts);
   tokenScene.updateEdges(tokenVerts);
@@ -202,8 +196,6 @@ function runUpdate() {
     effectiveDim(streamer.beliefBuf, streamer.count),
     effectiveDim(streamer.tokenBuf, streamer.count),
   );
-  rebuildLabels(beliefVerts, labelsBelief, "s");
-  rebuildLabels(tokenVerts, labelsToken, "o");
 }
 
 // ── Status badge ──────────────────────────────────────────────────────────────
@@ -261,40 +253,6 @@ function clearError() {
   errorWrap.textContent = "";
 }
 
-// ── Corner labels ─────────────────────────────────────────────────────────────
-function rebuildLabels(
-  verts: number[][],
-  container: HTMLElement,
-  prefix: string,
-) {
-  container.innerHTML = "";
-  verts.forEach((_, i) => {
-    const el = document.createElement("div");
-    el.className = "corner-label";
-    el.dataset.idx = String(i);
-    el.textContent = `${prefix}${i}`;
-    container.appendChild(el);
-  });
-}
-
-function updateLabelPositions(
-  verts: number[][] | null,
-  container: HTMLElement,
-  camera: THREE.Camera,
-) {
-  if (!verts) return;
-  const labels = container.querySelectorAll<HTMLElement>(".corner-label");
-  const w = container.clientWidth,
-    h = container.clientHeight;
-  labels.forEach((el, i) => {
-    if (i >= verts.length) return;
-    const v = new THREE.Vector3(verts[i][0], verts[i][1], verts[i][2]);
-    v.project(camera);
-    el.style.left = `${((v.x + 1) / 2) * w}px`;
-    el.style.top = `${((1 - v.y) / 2) * h}px`;
-  });
-}
-
 // ── Dim badges ────────────────────────────────────────────────────────────────
 function updateDimBadges(db: number, dt: number) {
   dimBeliefEl.textContent = `dim ${db}`;
@@ -340,8 +298,6 @@ function loop(now: number) {
   beliefScene.render(cam.beliefCam);
   tokenScene.render(cam.tokenCam);
 
-  updateLabelPositions(lastBeliefVerts, labelsBelief, cam.beliefCam);
-  updateLabelPositions(lastTokenVerts, labelsToken, cam.tokenCam);
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
