@@ -9,7 +9,7 @@ import { advanceAnimations } from "./widgets/animation.js";
 import { computePhi, sumT, isRowStochastic, Issue } from "./model/phi.js";
 import { effectiveDim } from "./model/dims.js";
 import { getVertices } from "./model/projection.js";
-import { CloudStreamer, aggregate } from "./model/stream.js";
+import { CloudStreamer, densityAlphas } from "./model/stream.js";
 import { createScene } from "./render/scene.js";
 import { setupCamera } from "./render/camera.js";
 import {
@@ -47,11 +47,6 @@ let currentSrc = "";
 let evalTimer: ReturnType<typeof setTimeout> | null = null;
 let lastBeliefVerts: number[][] | null = null;
 let lastTokenVerts: number[][] | null = null;
-let lastT: number[][][] | null = null;
-let lastInitial: number[] | null = null;
-let lastIssues: Issue[] = [];
-let dimFrame = 0;
-let wasFull = false;
 
 // ── Scenes, camera, streamer ──────────────────────────────────────────────────
 const beliefScene = createScene(canvasBelief);
@@ -176,11 +171,7 @@ function runUpdate() {
   clearError();
 
   const { T, initial } = spec;
-  lastT = T;
-  lastInitial = initial;
-
   const { phi, issues } = computePhi(T, initial);
-  lastIssues = issues;
 
   let beliefVerts: number[][], tokenVerts: number[][];
   try {
@@ -198,10 +189,16 @@ function runUpdate() {
   tokenScene.updateEdges(tokenVerts);
 
   streamer.reset(T, initial, phi, beliefVerts, tokenVerts);
-  dimFrame = 0;
-  wasFull = false;
+  streamer.tick(2);
 
-  updateStatus(T, initial, issues, false);
+  beliefScene.updatePoints(streamer.beliefBuf, densityAlphas(streamer.beliefBuf, streamer.count), streamer.count);
+  tokenScene.updatePoints(streamer.tokenBuf, densityAlphas(streamer.tokenBuf, streamer.count), streamer.count);
+
+  updateStatus(T, initial, issues, streamer.hasNegative);
+  updateDimBadges(
+    effectiveDim(streamer.beliefBuf, streamer.count),
+    effectiveDim(streamer.tokenBuf, streamer.count),
+  );
   rebuildLabels(beliefVerts, labelsBelief, "s");
   rebuildLabels(tokenVerts, labelsToken, "o");
 }
@@ -336,29 +333,6 @@ function loop(now: number) {
   if (animated) runUpdate();
 
   cam.sync();
-
-  // Tick the streamer — time-budget based until buffer full, then stable
-  const added = streamer.tick(2);
-  if (added) {
-    const bCloud = aggregate(streamer.beliefBuf, streamer.count);
-    const tCloud = aggregate(streamer.tokenBuf, streamer.count);
-    beliefScene.updatePoints(bCloud.positions, bCloud.alphas, bCloud.n);
-    tokenScene.updatePoints(tCloud.positions, tCloud.alphas, tCloud.n);
-
-    // Update has-negative status lazily
-    if (streamer.hasNegative && lastT && lastInitial)
-      updateStatus(lastT, lastInitial, lastIssues, true);
-
-    // Compute effective dim once when buffer fills
-    dimFrame++;
-    if (dimFrame % 60 === 0 || (streamer.full && !wasFull)) {
-      wasFull = streamer.full;
-      updateDimBadges(
-        effectiveDim(streamer.beliefBuf, streamer.count),
-        effectiveDim(streamer.tokenBuf, streamer.count),
-      );
-    }
-  }
 
   beliefScene.render(cam.beliefCam);
   tokenScene.render(cam.tokenCam);

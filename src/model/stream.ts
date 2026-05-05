@@ -1,47 +1,43 @@
 import { tokenPrediction } from './predict.js';
 import { project } from './projection.js';
 
-function sample(tp: number[]): number {
-  const w = tp.map(x => Math.max(x, 0));
-  const total = w.reduce((s, x) => s + x, 0);
-  if (total < 1e-12) return Math.floor(Math.random() * tp.length);
-  let r = Math.random() * total;
-  for (let i = 0; i < tp.length; i++) { r -= w[i]; if (r <= 0) return i; }
-  return tp.length - 1;
+// Mulberry32 seeded PRNG — deterministic, fast, good quality for simulation.
+function makePrng(seed: number): () => number {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
-export interface AggregatedCloud {
-  positions: Float32Array;
-  alphas: Float32Array;
-  n: number;
+function makeSample(rand: () => number) {
+  return function sample(tp: number[]): number {
+    const w = tp.map(x => Math.max(x, 0));
+    const total = w.reduce((s, x) => s + x, 0);
+    if (total < 1e-12) return Math.floor(rand() * tp.length);
+    let r = rand() * total;
+    for (let i = 0; i < tp.length; i++) { r -= w[i]; if (r <= 0) return i; }
+    return tp.length - 1;
+  };
 }
 
-export function aggregate(buf: Float32Array, count: number): AggregatedCloud {
-  const map = new Map<string, number>(); // key → index in output
-  const posArr: number[] = [];
-  const cntArr: number[] = [];
-
+// Returns one alpha per raw point based on visit frequency at that position.
+// Dense positions get higher alpha; all raw points are rendered.
+export function densityAlphas(buf: Float32Array, count: number): Float32Array {
+  const cntMap = new Map<string, number>();
   for (let i = 0; i < count; i++) {
-    const x = buf[i * 3], y = buf[i * 3 + 1], z = buf[i * 3 + 2];
-    const key = `${x.toFixed(4)},${y.toFixed(4)},${z.toFixed(4)}`;
-    const idx = map.get(key);
-    if (idx !== undefined) {
-      cntArr[idx]++;
-    } else {
-      map.set(key, cntArr.length);
-      posArr.push(x, y, z);
-      cntArr.push(1);
-    }
+    const key = `${buf[i*3].toFixed(4)},${buf[i*3+1].toFixed(4)},${buf[i*3+2].toFixed(4)}`;
+    cntMap.set(key, (cntMap.get(key) ?? 0) + 1);
   }
-
-  const n = cntArr.length;
-  const maxCnt = Math.max(1, ...cntArr);
-  const positions = new Float32Array(posArr);
-  const alphas = new Float32Array(n);
-  for (let i = 0; i < n; i++)
-    alphas[i] = 0.15 + 0.85 * Math.sqrt(cntArr[i] / maxCnt);
-
-  return { positions, alphas, n };
+  const maxCnt = Math.max(1, ...cntMap.values());
+  const alphas = new Float32Array(count);
+  for (let i = 0; i < count; i++) {
+    const key = `${buf[i*3].toFixed(4)},${buf[i*3+1].toFixed(4)},${buf[i*3+2].toFixed(4)}`;
+    alphas[i] = 0.15 + 0.85 * Math.sqrt(cntMap.get(key)! / maxCnt);
+  }
+  return alphas;
 }
 
 export class CloudStreamer {
@@ -50,7 +46,6 @@ export class CloudStreamer {
   count = 0;
   hasNegative = false;
 
-  private writeIdx = 0;
   private T: number[][][] = [];
   private phi: number[] = [];
   private beliefVerts: number[][] = [];
@@ -58,6 +53,7 @@ export class CloudStreamer {
   private initialState: number[] = [];
   private curState: number[] = [];
   private wordPos = 0;
+  private sample: (tp: number[]) => number = () => 0;
   private readonly maxPoints: number;
 
   constructor(maxPoints = 3000) {
@@ -66,28 +62,27 @@ export class CloudStreamer {
     this.tokenBuf = new Float32Array(maxPoints * 3);
   }
 
-  get full(): boolean { return this.count >= this.maxPoints; }
-
   reset(
     T: number[][][],
     initial: number[],
     phi: number[],
     beliefVerts: number[][],
-    tokenVerts: number[][]
+    tokenVerts: number[][],
+    seed = 42
   ) {
     this.T = T; this.phi = phi;
     this.beliefVerts = beliefVerts; this.tokenVerts = tokenVerts;
-    this.count = 0; this.writeIdx = 0; this.hasNegative = false; this.wordPos = 0;
+    this.count = 0; this.hasNegative = false; this.wordPos = 0;
+    this.sample = makeSample(makePrng(seed));
     const norm = initial.reduce((s, x, i) => s + x * phi[i], 0);
     this.initialState = Math.abs(norm) < 1e-15 ? [...initial] : initial.map(x => x / norm);
     this.curState = [...this.initialState];
   }
 
-  tick(budgetMs = 2): boolean {
-    if (this.T.length === 0 || this.count >= this.maxPoints) return false;
+  tick(budgetMs = 2): void {
+    if (this.T.length === 0 || this.count >= this.maxPoints) return;
     const deadline = performance.now() + budgetMs;
     const n = this.curState.length;
-    let added = false;
 
     while (performance.now() < deadline && this.count < this.maxPoints) {
       const tp = tokenPrediction(this.T, this.curState, this.phi);
@@ -97,19 +92,17 @@ export class CloudStreamer {
 
       const bPt = project(this.curState, this.beliefVerts);
       const tPt = project(tp, this.tokenVerts);
-      const idx = this.writeIdx * 3;
+      const idx = this.count * 3;
       this.beliefBuf[idx] = bPt[0]; this.beliefBuf[idx + 1] = bPt[1]; this.beliefBuf[idx + 2] = bPt[2];
       this.tokenBuf[idx]  = tPt[0]; this.tokenBuf[idx + 1]  = tPt[1]; this.tokenBuf[idx + 2]  = tPt[2];
-      this.writeIdx = (this.writeIdx + 1) % this.maxPoints;
-      if (this.count < this.maxPoints) this.count++;
-      added = true;
+      this.count++;
 
       this.wordPos++;
       if (this.wordPos >= 64) {
         this.curState = [...this.initialState];
         this.wordPos = 0;
       } else {
-        const w = sample(tp);
+        const w = this.sample(tp);
         const next = new Array(n).fill(0);
         for (let j = 0; j < n; j++)
           for (let k = 0; k < n; k++)
@@ -122,6 +115,5 @@ export class CloudStreamer {
         }
       }
     }
-    return added;
   }
 }

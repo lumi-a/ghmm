@@ -5,7 +5,7 @@ export interface Preset {
 
 export const PRESETS: Preset[] = [
   {
-    name: 'z1r',
+    name: "z1r",
     code: `\
 // Zero-One-Random — 3 states, 2 obs
 // HMM. Belief dim 2, token dim 1 — large gap.
@@ -17,7 +17,7 @@ const initial = np.array([1/3, 1/3, 1/3]);
 `,
   },
   {
-    name: 'No Consecutive Ones',
+    name: "No Consecutive Ones",
     code: `\
 // No Consecutive Ones — 2 states, 2 obs
 // HMM. After emitting 1, must emit 0 next.
@@ -31,7 +31,7 @@ const initial = np.array([2/3, 1/3]);
 `,
   },
   {
-    name: 'Even Ones',
+    name: "Even Ones",
     code: `\
 // Even Ones — 2 states, 2 obs
 // HMM. Emits 1 only in pairs; same T_total as No-Consec-Ones,
@@ -46,7 +46,7 @@ const initial = np.array([2/3, 1/3]);
 `,
   },
   {
-    name: 'SNS',
+    name: "SNS",
     code: `\
 // Simple Nonunifilar Source — 2 states, 2 obs
 // GHMM (nonunifilar): same observation can come from different state
@@ -61,7 +61,7 @@ const initial = np.array([q/(p+q), p/(p+q)]);
 `,
   },
   {
-    name: 'Mess3',
+    name: "Mess3",
     code: `\
 // Mess3 — 3 states, 3 obs
 // HMM. Symmetric permutation structure; 3-state analogue of Mess4.
@@ -79,7 +79,7 @@ const initial = np.array([1/3, 1/3, 1/3]);
 `,
   },
   {
-    name: 'Mess4',
+    name: "Mess4",
     code: `\
 // Mess4 — 4 states, 4 obs
 // HMM. Symmetric permutation structure; both dims ≤ 3 in generic regime.
@@ -99,7 +99,7 @@ const initial = np.array([0.25, 0.25, 0.25, 0.25]);
 `,
   },
   {
-    name: 'Tom Quantum',
+    name: "Tom Quantum",
     code: `\
 // Tom Quantum — 3 states, 4 obs
 // GHMM. Quantum measurement model; OOM with complex structure.
@@ -120,7 +120,7 @@ const initial = np.array([1/3, 1/3, 1/3]);
 `,
   },
   {
-    name: 'Fanizza',
+    name: "Fanizza",
     code: `\
 // Fanizza — 4 states, 2 obs
 // GHMM. Quantum-inspired process with rotation in state space.
