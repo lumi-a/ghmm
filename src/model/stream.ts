@@ -79,7 +79,7 @@ export class CloudStreamer {
     this.curState = [...this.initialState];
   }
 
-  tick(budgetMs = 2): void {
+  tick(budgetMs = 5): void {
     if (this.T.length === 0 || this.count >= this.maxPoints) return;
     const deadline = performance.now() + budgetMs;
     const n = this.curState.length;

@@ -189,10 +189,18 @@ function runUpdate() {
   tokenScene.updateEdges(tokenVerts);
 
   streamer.reset(T, initial, phi, beliefVerts, tokenVerts);
-  streamer.tick(2);
+  streamer.tick();
 
-  beliefScene.updatePoints(streamer.beliefBuf, densityAlphas(streamer.beliefBuf, streamer.count), streamer.count);
-  tokenScene.updatePoints(streamer.tokenBuf, densityAlphas(streamer.tokenBuf, streamer.count), streamer.count);
+  beliefScene.updatePoints(
+    streamer.beliefBuf,
+    densityAlphas(streamer.beliefBuf, streamer.count),
+    streamer.count,
+  );
+  tokenScene.updatePoints(
+    streamer.tokenBuf,
+    densityAlphas(streamer.tokenBuf, streamer.count),
+    streamer.count,
+  );
 
   updateStatus(T, initial, issues, streamer.hasNegative);
   updateDimBadges(
