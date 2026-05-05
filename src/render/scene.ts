@@ -10,8 +10,8 @@ export interface SceneHandle {
 }
 
 const VERT = `
-attribute float aAlpha;
-varying float vAlpha;
+in float aAlpha;
+out float vAlpha;
 void main() {
   vAlpha = aAlpha;
   gl_PointSize = 2.0;
@@ -20,9 +20,10 @@ void main() {
 `;
 
 const FRAG = `
-varying float vAlpha;
+in float vAlpha;
+out vec4 fragColor;
 void main() {
-  gl_FragColor = vec4(0.267, 0.533, 1.0, vAlpha);
+  fragColor = vec4(0.267, 0.533, 1.0, vAlpha);
 }
 `;
 
@@ -40,6 +41,7 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     fragmentShader: FRAG,
     transparent: true,
     depthWrite: false,
+    glslVersion: THREE.GLSL3,
   });
   const points = new THREE.Points(pointsGeo, pointsMat);
   scene.add(points);

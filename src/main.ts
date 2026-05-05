@@ -20,6 +20,17 @@ import {
 } from "./url.js";
 import type { WidgetDecl } from "./widgets/registry.js";
 
+// ── WebGL2 check ──────────────────────────────────────────────────────────────
+if (!document.createElement("canvas").getContext("webgl2")) {
+  document.body.innerHTML = `<div style="position:fixed;inset:0;display:grid;place-items:center;background:#111;color:#ddd;font:14px monospace;text-align:center;padding:2rem">
+    <div>
+      <p>This app requires WebGL2, which is not available in your browser.</p>
+      <p style="margin-top:1rem;color:#888">Try Chrome, Firefox 51+, or Safari 15+.</p>
+    </div>
+  </div>`;
+  throw new Error("WebGL2 not available");
+}
+
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const presetSelect = document.getElementById(
   "preset-select",
