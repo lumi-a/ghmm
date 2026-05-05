@@ -137,12 +137,15 @@ presetSelect.addEventListener("change", () => {
 });
 
 // ── Editor ────────────────────────────────────────────────────────────────────
-const editor = setupEditor(editorWrap, PRESETS[0].code, (code) => {
+const defaultPresetIdx = PRESETS.findIndex(p => p.name === "Mess4");
+const defaultPreset = PRESETS[defaultPresetIdx < 0 ? 0 : defaultPresetIdx];
+presetSelect.value = String(defaultPresetIdx);
+const editor = setupEditor(editorWrap, defaultPreset.code, (code) => {
   currentSrc = code;
   scheduleEval(200);
   scheduleSaveCode(code, 500);
 });
-currentSrc = PRESETS[0].code;
+currentSrc = defaultPreset.code;
 
 const urlCode = loadCodeFromURL();
 if (urlCode !== null) {
