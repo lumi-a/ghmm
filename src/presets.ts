@@ -8,7 +8,6 @@ export const PRESETS: Preset[] = [
     name: "z1r",
     code: `\
 // Zero-One-Random — 3 states, 2 obs
-// HMM. Belief dim 2, token dim 1 — large gap.
 const T = np.array([
   [[0, 1, 0], [0, 0, 0], [0.5, 0, 0]],
   [[0, 0, 0], [0, 0, 1], [0.5, 0, 0]],
@@ -34,8 +33,7 @@ const initial = np.array([2/3, 1/3]);
     name: "Even Ones",
     code: `\
 // Even Ones — 2 states, 2 obs
-// HMM. Emits 1 only in pairs; same T_total as No-Consec-Ones,
-// different belief/token geometry.
+// HMM. Emits 1 only in pairs
 const p = slider('p', 0, 1, 0.5);
 const q = 1 - p;
 const T = np.array([
@@ -49,8 +47,6 @@ const initial = np.array([2/3, 1/3]);
     name: "SNS",
     code: `\
 // Simple Nonunifilar Source — 2 states, 2 obs
-// GHMM (nonunifilar): same observation can come from different state
-// transitions, so next state is not determined by (state, obs).
 const p = slider('p', 0, 1, 0.5);
 const q = slider('q', 0, 1, 0.5);
 const T = np.array([
@@ -64,7 +60,6 @@ const initial = np.array([q/(p+q), p/(p+q)]);
     name: "Mess3",
     code: `\
 // Mess3 — 3 states, 3 obs
-// HMM. Symmetric permutation structure; 3-state analogue of Mess4.
 const x = slider('x', 0, 0.5, 0.15);
 const a = slider('a', 0, 1, 0.2);
 const b = (1 - a) / 2;
@@ -82,7 +77,6 @@ const initial = np.array([1/3, 1/3, 1/3]);
     name: "Mess4",
     code: `\
 // Mess4 — 4 states, 4 obs
-// HMM. Symmetric permutation structure; both dims ≤ 3 in generic regime.
 const x = slider('x', 0, 0.5, 0.15);
 const a = slider('a', 0, 1, 0.2);
 const b = (1 - a) / 3;
@@ -102,7 +96,7 @@ const initial = np.array([0.25, 0.25, 0.25, 0.25]);
     name: "Tom Quantum",
     code: `\
 // Tom Quantum — 3 states, 4 obs
-// GHMM. Quantum measurement model; OOM with complex structure.
+// GHMM. Quantum measurement model
 // T_total is not row-stochastic in general.
 const alpha = slider('α', 0.1, 2, 1);
 const beta  = slider('β', 0.1, 2, 0.5);
