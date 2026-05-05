@@ -85,8 +85,8 @@ const initial = np.array([1/3, 1/3, 1/3]);
 // HMM. Symmetric permutation structure; both dims ≤ 3 in generic regime.
 const x = slider('x', 0, 0.5, 0.15);
 const a = slider('a', 0, 1, 0.2);
-const b = (1 - a) / 2;
-const y = 1 - 2 * x;
+const b = (1 - a) / 3;
+const y = 1 - 3 * x;
 const ay = a*y, bx = b*x, by = b*y, ax = a*x;
 
 const T = np.array([
