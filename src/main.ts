@@ -61,7 +61,7 @@ function addViewportFov(bodyEl: HTMLElement, camera: THREE.PerspectiveCamera) {
     (e) => {
       e.preventDefault();
       e.stopPropagation();
-      camera.fov = Math.max(10, Math.min(120, camera.fov + e.deltaY * 0.05));
+      camera.fov = Math.max(0.01, Math.min(170, camera.fov * Math.exp(e.deltaY * 0.002)));
       camera.updateProjectionMatrix();
     },
     { passive: false },
@@ -90,7 +90,7 @@ function addViewportFov(bodyEl: HTMLElement, camera: THREE.PerspectiveCamera) {
         e.touches[0].clientY - e.touches[1].clientY,
       );
       if (lastDist > 0) {
-        camera.fov = Math.max(10, Math.min(120, camera.fov * (lastDist / d)));
+        camera.fov = Math.max(1, Math.min(170,camera.fov * (lastDist / d)));
         camera.updateProjectionMatrix();
       }
       lastDist = d;
