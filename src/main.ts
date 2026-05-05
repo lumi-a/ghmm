@@ -12,12 +12,6 @@ import { getVertices } from "./model/projection.js";
 import { CloudStreamer, densityAlphas } from "./model/stream.js";
 import { createScene } from "./render/scene.js";
 import { setupCamera } from "./render/camera.js";
-import {
-  loadCodeFromURL,
-  scheduleSaveCode,
-  clearCodeFromURL,
-  loadWidgetsFromURL,
-} from "./url.js";
 import type { WidgetDecl } from "./widgets/registry.js";
 
 // ── WebGL2 check ──────────────────────────────────────────────────────────────
@@ -133,7 +127,6 @@ PRESETS.forEach((preset, idx) => {
 presetSelect.addEventListener("change", () => {
   const preset = PRESETS[Number(presetSelect.value)];
   editor.setValue(preset.code);
-  clearCodeFromURL();
 });
 
 // ── Editor ────────────────────────────────────────────────────────────────────
@@ -143,20 +136,8 @@ presetSelect.value = String(defaultPresetIdx);
 const editor = setupEditor(editorWrap, defaultPreset.code, (code) => {
   currentSrc = code;
   scheduleEval(200);
-  scheduleSaveCode(code, 500);
 });
 currentSrc = defaultPreset.code;
-
-const urlCode = loadCodeFromURL();
-if (urlCode !== null) {
-  editor.setValue(urlCode);
-  presetSelect.value = "";
-}
-
-for (const [k, v] of loadWidgetsFromURL()) {
-  const num = Number(v);
-  widgetState.values.set(k, isNaN(num) ? v : num);
-}
 
 // ── Update pipeline ───────────────────────────────────────────────────────────
 function scheduleEval(delayMs: number) {
