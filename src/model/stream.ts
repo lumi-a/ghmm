@@ -53,6 +53,8 @@ export class CloudStreamer {
   private initialState: number[] = [];
   private curState: number[] = [];
   private wordPos = 0;
+  private trajLen = 0;
+  private rand: () => number = () => 0;
   private sample: (tp: number[]) => number = () => 0;
   private readonly maxPoints: number;
 
@@ -73,10 +75,16 @@ export class CloudStreamer {
     this.T = T; this.phi = phi;
     this.beliefVerts = beliefVerts; this.tokenVerts = tokenVerts;
     this.count = 0; this.hasNegative = false; this.wordPos = 0;
-    this.sample = makeSample(makePrng(seed));
+    this.rand = makePrng(seed);
+    this.sample = makeSample(this.rand);
     const norm = initial.reduce((s, x, i) => s + x * phi[i], 0);
     this.initialState = Math.abs(norm) < 1e-15 ? [...initial] : initial.map(x => x / norm);
     this.curState = [...this.initialState];
+    this.trajLen = this.newTrajLen();
+  }
+
+  private newTrajLen(): number {
+    return 16 + Math.floor(this.rand() * 17); // uniform in [16, 32]
   }
 
   tick(): void {
