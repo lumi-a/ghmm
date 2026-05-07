@@ -28,8 +28,8 @@ export function advanceAnimations(
   let changed = false;
   for (const decl of decls) {
     if (decl.kind !== 'slider' || !playing.has(decl.name)) continue;
-    const min = decl.min!;
-    const max = decl.max!;
+    const min = decl.min;
+    const max = decl.max;
     const dir = directions.get(decl.name) ?? 1;
     const current = Number(state.values.get(decl.name) ?? decl.def);
     let next = current + dir * (dtMs / 1000) * ((max - min) / 5);

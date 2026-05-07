@@ -35,7 +35,7 @@ export function densityAlphas(buf: Float32Array, count: number): Float32Array {
   const alphas = new Float32Array(count);
   for (let i = 0; i < count; i++) {
     const key = `${buf[i*3].toFixed(4)},${buf[i*3+1].toFixed(4)},${buf[i*3+2].toFixed(4)}`;
-    alphas[i] = 0.15 + 0.85 * Math.sqrt(cntMap.get(key)! / maxCnt);
+    alphas[i] = 0.15 + 0.85 * Math.sqrt(cntMap.get(key) / maxCnt);
   }
   return alphas;
 }

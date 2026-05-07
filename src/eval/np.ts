@@ -27,7 +27,7 @@ export const np = {
 
   zeros(shape: number | number[]): any {
     if (typeof shape === 'number') return new Array(shape).fill(0);
-    const [m, n] = shape as number[];
+    const [m, n] = shape;
     return Array.from({ length: m }, () => new Array(n).fill(0));
   },
 

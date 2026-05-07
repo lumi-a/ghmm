@@ -26,7 +26,7 @@ export function syncWidgetUI(
       elements.set(decl.name, el);
       container.appendChild(el);
     } else {
-      refreshWidget(elements.get(decl.name)!, decl, state);
+      refreshWidget(elements.get(decl.name), decl, state);
     }
   }
 }

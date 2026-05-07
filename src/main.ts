@@ -29,13 +29,13 @@ if (!document.createElement("canvas").getContext("webgl2")) {
 const presetSelect = document.getElementById(
   "preset-select",
 ) as HTMLSelectElement;
-const editorWrap = document.getElementById("editor-wrap") as HTMLElement;
-const widgetsWrap = document.getElementById("widgets-wrap") as HTMLElement;
-const statusBadge = document.getElementById("status-badge") as HTMLElement;
-const tooltip = document.getElementById("badge-tooltip") as HTMLElement;
-const errorWrap = document.getElementById("error-wrap") as HTMLElement;
-const dimBeliefEl = document.getElementById("dim-belief") as HTMLElement;
-const dimTokenEl = document.getElementById("dim-token") as HTMLElement;
+const editorWrap = document.getElementById("editor-wrap");
+const widgetsWrap = document.getElementById("widgets-wrap");
+const statusBadge = document.getElementById("status-badge");
+const tooltip = document.getElementById("badge-tooltip");
+const errorWrap = document.getElementById("error-wrap");
+const dimBeliefEl = document.getElementById("dim-belief");
+const dimTokenEl = document.getElementById("dim-token");
 const canvasBelief = document.getElementById(
   "canvas-belief",
 ) as HTMLCanvasElement;
@@ -52,7 +52,7 @@ let evalTimer: ReturnType<typeof setTimeout> | null = null;
 // ── Scenes, camera, streamer ──────────────────────────────────────────────────
 const beliefScene = createScene(canvasBelief);
 const tokenScene = createScene(canvasToken);
-const cam = setupCamera(document.getElementById("viewports") as HTMLElement);
+const cam = setupCamera(document.getElementById("viewports"));
 const streamer = new CloudStreamer();
 
 // ── Per-viewport FOV (scroll wheel / pinch) ───────────────────────────────────
@@ -104,11 +104,11 @@ function addViewportFov(bodyEl: HTMLElement, camera: THREE.PerspectiveCamera) {
 }
 
 addViewportFov(
-  document.querySelector("#vp-belief .vp-body") as HTMLElement,
+  document.querySelector("#vp-belief .vp-body"),
   cam.beliefCam,
 );
 addViewportFov(
-  document.querySelector("#vp-token  .vp-body") as HTMLElement,
+  document.querySelector("#vp-token  .vp-body"),
   cam.tokenCam,
 );
 
@@ -154,7 +154,7 @@ function runUpdate() {
     return;
   }
 
-  const spec = result.spec!;
+  const spec = result.spec;
   const valErr = validateSpec(spec);
   if (valErr) {
     showError(valErr);
@@ -278,8 +278,8 @@ function handleResize() {
 }
 
 const ro = new ResizeObserver(handleResize);
-ro.observe(canvasBelief.parentElement!);
-ro.observe(canvasToken.parentElement!);
+ro.observe(canvasBelief.parentElement);
+ro.observe(canvasToken.parentElement);
 handleResize();
 
 // ── Render loop ───────────────────────────────────────────────────────────────
