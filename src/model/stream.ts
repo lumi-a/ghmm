@@ -1,7 +1,7 @@
 import { tokenPrediction } from './predict.js';
 import { project } from './projection.js';
 
-// Mulberry32 seeded PRNG — deterministic, fast, good quality for simulation.
+// Mulberry32 seeded PRNG - deterministic, fast, good quality for simulation.
 function makePrng(seed: number): () => number {
   let s = seed >>> 0;
   return () => {

@@ -19,7 +19,7 @@ export function syncWidgetUI(
     }
   }
 
-  // Add new widgets; update existing ones in-place (no DOM moves — moving nodes swallows clicks)
+  // Add new widgets; update existing ones in-place (no DOM moves - moving nodes swallows clicks)
   for (const decl of decls) {
     if (!elements.has(decl.name)) {
       const el = buildWidget(decl, state, onChange);

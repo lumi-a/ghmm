@@ -213,7 +213,7 @@ function updateStatus(
     tip = issues.map(formatIssue).join("; ");
   } else if (hasNegative) {
     kind = "oom-neg";
-    label = "OOM — negative probs";
+    label = "OOM - negative probs";
     tip = "Negative probabilities detected during belief state propagation.";
   } else if (isRowStochastic(sumT(T))) {
     kind = "hmm";
@@ -222,7 +222,7 @@ function updateStatus(
   } else {
     kind = "oom";
     label = "OOM";
-    tip = "T_total is not row-stochastic — observable operator model.";
+    tip = "T_total is not row-stochastic - observable operator model.";
   }
 
   statusBadge.textContent = label;
@@ -261,7 +261,7 @@ function updateDimBadges(db: number, dt: number) {
   dimBeliefEl.style.background = gap ? "#2a3a4a" : "";
   dimBeliefEl.style.color = gap ? "#88bbff" : "";
   dimBeliefEl.title = gap
-    ? "Belief dim > token dim — hidden state not recoverable from next-token predictions"
+    ? "Belief dim > token dim - hidden state not recoverable from next-token predictions"
     : "";
 }
 

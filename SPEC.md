@@ -1,10 +1,10 @@
-# HMM Belief State Visualizer — Implementation Spec
+# HMM Belief State Visualizer - Implementation Spec
 
 ## Context
 
 Port and extend `reference.py` (included in repo) to a static web site. That file contains:
 - The GHMM probability math (`calculate_probability`, `predict`) with the convention `T[observation, prev_state, next_state]`.
-- Test assertions that verify the algorithm on the z1r and RRXOR processes — **treat these as ground truth** and port them as unit tests.
+- Test assertions that verify the algorithm on the z1r and RRXOR processes - **treat these as ground truth** and port them as unit tests.
 - The current Mess4 visualization producing a 3D point cloud over a tetrahedron.
 
 Read `reference.py` first.
@@ -78,7 +78,7 @@ export function runUserCode(src: string, state: WidgetState): ModelSpec {
 }
 ```
 
-Widget **names are required** and are the identity key. Do not fall back to positional identity — that breaks under conditionals and reorderings.
+Widget **names are required** and are the identity key. Do not fall back to positional identity - that breaks under conditionals and reorderings.
 
 `np` is a minimal shim: `np.array`, `np.zeros`, `np.ones`, `np.eye`, element-wise arithmetic, matmul, slicing. Goal is that the reference.py matrix construction code ports with minimal edits, not full numpy parity.
 
@@ -103,7 +103,7 @@ Validate and error out (inline UI message, keep editor usable) if:
 
 Algorithm: phi is the right-eigenvector of `T_total = sum_w T[w]` with eigenvalue 1, normalized so that `initial · phi = 1`. Reference: Jaeger (2000), *Observable Operator Models for Discrete Stochastic Time Series*, Neural Computation 12(6).
 
-Why it works: for total probability mass over length-k sequences to equal 1, we need `initial · T_total^k · phi = 1` for all k, which forces `T_total · phi = phi`. For HMMs (`T_total` row-stochastic), `phi = (1,...,1)` drops out for free — this gives a free sanity check.
+Why it works: for total probability mass over length-k sequences to equal 1, we need `initial · T_total^k · phi = 1` for all k, which forces `T_total · phi = phi`. For HMMs (`T_total` row-stochastic), `phi = (1,...,1)` drops out for free - this gives a free sanity check.
 
 ```ts
 export interface PhiResult {
@@ -131,14 +131,14 @@ export function computePhi(T: number[][][], initial: number[], tol = 1e-9): PhiR
 
 Small status badge in a corner of the viz. Four states:
 
-- **green "HMM"** — no structural issues; `T_total` row-stochastic (all row sums within `1e-6` of 1, all entries between 0 and 1)
-- **blue "OOM"** — no structural issues; `T_total` not row-stochastic
-- **amber "OOM — negative probs"** — during point-cloud generation, some belief state or predicted probability dropped below `-1e-9`
-- **red "ill-posed"** — any issue returned by `computePhi`
+- **green "HMM"** - no structural issues; `T_total` row-stochastic (all row sums within `1e-6` of 1, all entries between 0 and 1)
+- **blue "OOM"** - no structural issues; `T_total` not row-stochastic
+- **amber "OOM - negative probs"** - during point-cloud generation, some belief state or predicted probability dropped below `-1e-9`
+- **red "ill-posed"** - any issue returned by `computePhi`
 
 Hover shows a tooltip with specifics. No modals, no blocking.
 
-The amber detection runs during cloud generation: when walking sequences, watch for negative components. Don't bail out — keep rendering the cloud including whatever degenerate points fall out.
+The amber detection runs during cloud generation: when walking sequences, watch for negative components. Don't bail out - keep rendering the cloud including whatever degenerate points fall out.
 
 ## Projection
 
@@ -162,7 +162,7 @@ Label simplex corners with state indices (belief cloud) and observation indices 
 
 Center each cloud (subtract mean), SVD, count singular values above `1e-6 * sigma_max`. Display per-viewport as a small badge: e.g. `dim 2`.
 
-When `dim_belief > dim_token`, annotate or highlight — this is the conceptually interesting regime (belief is not recoverable from next-token predictions, i.e. the process genuinely uses hidden state).
+When `dim_belief > dim_token`, annotate or highlight - this is the conceptually interesting regime (belief is not recoverable from next-token predictions, i.e. the process genuinely uses hidden state).
 
 Recompute effective dim on every re-eval. It's cheap and it's fine if the number flickers as sliders move.
 
@@ -170,7 +170,7 @@ Recompute effective dim on every re-eval. It's cheap and it's fine if the number
 
 Two adjacent 3D viewports, side by side. Headers: "Belief states" / "Next-token predictions".
 
-**Camera sharing**: one `OrbitControls` instance attached to a hidden "master" `PerspectiveCamera`. Each frame, copy `master.quaternion` and `master.position` to both visible cameras. Each visible camera has its own `fov` (slider or fixed difference) → independent zoom while rotation/translation stay locked. Always share, even when effective dims differ — seeing the token cloud edge-on *is* the signal that dim is smaller.
+**Camera sharing**: one `OrbitControls` instance attached to a hidden "master" `PerspectiveCamera`. Each frame, copy `master.quaternion` and `master.position` to both visible cameras. Each visible camera has its own `fov` (slider or fixed difference) → independent zoom while rotation/translation stay locked. Always share, even when effective dims differ - seeing the token cloud edge-on *is* the signal that dim is smaller.
 
 **Points**: `THREE.Points` with `BufferGeometry`, size ~2px, opacity ~0.5, uniform color to start. Leave a hook for color-by-observation-history later.
 
@@ -182,10 +182,10 @@ Two adjacent 3D viewports, side by side. Headers: "Belief states" / "Next-token 
 
 Two kinds:
 
-- `slider(name, min, max, default?)` — continuous, use min if default is not given
-- `toggle(name, default?)` — checkbox, use false if default is not given
+- `slider(name, min, max, default?)` - continuous, use min if default is not given
+- `toggle(name, default?)` - checkbox, use false if default is not given
 
-Each `slider` has a small ▶ button next to it. Clicking toggles animation. Single `requestAnimationFrame` loop advances all playing widgets, writes new values into the state store, and triggers the re-render path. While widgets are animating, code edits should still work — debounce code re-eval (~200ms) so typing isn't laggy.
+Each `slider` has a small ▶ button next to it. Clicking toggles animation. Single `requestAnimationFrame` loop advances all playing widgets, writes new values into the state store, and triggers the re-render path. While widgets are animating, code edits should still work - debounce code re-eval (~200ms) so typing isn't laggy.
 
 ## URL state
 
@@ -195,13 +195,13 @@ Debounce URL writes (~500ms) to avoid history spam. Prefer `history.replaceState
 
 ## Presets
 
-Dropdown above the editor. Selecting replaces editor contents. Presets are strings of code — no "builtin vs custom" split. Ship at minimum:
+Dropdown above the editor. Selecting replaces editor contents. Presets are strings of code - no "builtin vs custom" split. Ship at minimum:
 
 - **z1r**: 3 states, binary obs. `predict_z1r` from `reference.py`. Initial uniform over 3 states. No sliders; shows a belief cloud of dim 2 and a token cloud of dim 1 (gap = 1).
 - **RRXOR**: 5 states, binary obs. `xor_T` from `reference.py`. Two sliders `p = slider('p', 0, 1, 0.5)`, `q = slider('q', 0, 1, 0.5)`. Big dim gap.
 - **Mess4**: 4 states, 4 obs. `mess4_T` from `reference.py`. Two sliders `x = slider('x', 0, 1, 0.15)`, `a = slider('a', 0, 1, 0.2)`. Both dims ≤ 3 (equal in generic regime).
 
-Each preset is a self-contained snippet of user code — the same kind of code the user would write themselves.
+Each preset is a self-contained snippet of user code - the same kind of code the user would write themselves.
 
 ## Build and deploy
 

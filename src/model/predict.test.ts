@@ -7,7 +7,7 @@ const z1r_T = [
   [[0, 0, 0], [0, 0, 1], [0.5, 0, 0]],
 ];
 const z1r_initial = [1 / 3, 1 / 3, 1 / 3];
-const z1r_phi = [1, 1, 1]; // HMM — phi = ones
+const z1r_phi = [1, 1, 1]; // HMM - phi = ones
 
 function close(a: number[], b: number[], eps = 1e-10): boolean {
   return a.every((v, i) => Math.abs(v - b[i]) < eps);
