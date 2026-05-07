@@ -3,6 +3,7 @@
 ## Context
 
 Port and extend `reference.py` (included in repo) to a static web site. That file contains:
+
 - The GHMM probability math (`calculate_probability`, `predict`) with the convention `T[observation, prev_state, next_state]`.
 - Test assertions that verify the algorithm on the z1r and RRXOR processes - **treat these as ground truth** and port them as unit tests.
 - The current Mess4 visualization producing a 3D point cloud over a tetrahedron.
@@ -59,18 +60,34 @@ User source is evaluated via `new Function(...)` with widget factories injected 
 // eval/run.ts
 export function runUserCode(src: string, state: WidgetState): ModelSpec {
   const registry: WidgetDecl[] = [];
-  const slider = (name: string, min: number, max: number, def: number, step?: number) => {
-    registry.push({ kind: 'slider', name, min, max, def, step });
+  const slider = (
+    name: string,
+    min: number,
+    max: number,
+    def: number,
+    step?: number,
+  ) => {
+    registry.push({ kind: "slider", name, min, max, def, step });
     return state.values.get(name) ?? def;
   };
-  const select = (name: string, options: string[], def?: string) => { /* ... */ };
-  const toggle = (name: string, def: boolean) => { /* ... */ };
-  const number = (name: string, def: number) => { /* ... */ };
+  const select = (name: string, options: string[], def?: string) => {
+    /* ... */
+  };
+  const toggle = (name: string, def: boolean) => {
+    /* ... */
+  };
+  const number = (name: string, def: number) => {
+    /* ... */
+  };
 
   const fn = new Function(
-    'slider', 'select', 'toggle', 'number', 'np',
+    "slider",
+    "select",
+    "toggle",
+    "number",
+    "np",
     `"use strict"; ${src}
-     return (typeof result !== 'undefined') ? result : { T, initial };`
+     return (typeof result !== 'undefined') ? result : { T, initial };`,
   );
   const out = fn(slider, select, toggle, number, np);
   syncWidgetUI(registry);
@@ -94,6 +111,7 @@ User code returns either `{ T, initial }` (implicit via trailing `return { T, in
 ```
 
 Validate and error out (inline UI message, keep editor usable) if:
+
 - `T` shape inconsistent with `initial`
 - `n_states > 4` → "State count > 4 not supported; reduce in code or project yourself"
 - `|O| > 4` → same, for observation space
@@ -101,7 +119,7 @@ Validate and error out (inline UI message, keep editor usable) if:
 
 ## phi computation
 
-Algorithm: phi is the right-eigenvector of `T_total = sum_w T[w]` with eigenvalue 1, normalized so that `initial · phi = 1`. Reference: Jaeger (2000), *Observable Operator Models for Discrete Stochastic Time Series*, Neural Computation 12(6).
+Algorithm: phi is the right-eigenvector of `T_total = sum_w T[w]` with eigenvalue 1, normalized so that `initial · phi = 1`. Reference: Jaeger (2000), _Observable Operator Models for Discrete Stochastic Time Series_, Neural Computation 12(6).
 
 Why it works: for total probability mass over length-k sequences to equal 1, we need `initial · T_total^k · phi = 1` for all k, which forces `T_total · phi = phi`. For HMMs (`T_total` row-stochastic), `phi = (1,...,1)` drops out for free - this gives a free sanity check.
 
@@ -111,14 +129,18 @@ export interface PhiResult {
   issues: Issue[];
 }
 type Issue =
-  | { kind: 'no-unit-eigenvalue'; closest: number }
-  | { kind: 'multiplicity'; count: number }
-  | { kind: 'complex-phi'; maxImag: number }
-  | { kind: 'initial-orthogonal-to-phi' };
+  | { kind: "no-unit-eigenvalue"; closest: number }
+  | { kind: "multiplicity"; count: number }
+  | { kind: "complex-phi"; maxImag: number }
+  | { kind: "initial-orthogonal-to-phi" };
 
-export function computePhi(T: number[][][], initial: number[], tol = 1e-9): PhiResult {
-  const Ttotal = sumOverObservations(T);       // sum_w T[w]
-  const { real, imag, vectorsReal, vectorsImag } = eig(Ttotal);  // general (non-symmetric) eig
+export function computePhi(
+  T: number[][][],
+  initial: number[],
+  tol = 1e-9,
+): PhiResult {
+  const Ttotal = sumOverObservations(T); // sum_w T[w]
+  const { real, imag, vectorsReal, vectorsImag } = eig(Ttotal); // general (non-symmetric) eig
   // find eigenvalue closest to 1 (on real axis)
   // extract corresponding eigenvector, report if imag part is non-negligible
   // report multiplicity if more than one eigenvalue is within 1e-4 of 1
@@ -170,7 +192,7 @@ Recompute effective dim on every re-eval. It's cheap and it's fine if the number
 
 Two adjacent 3D viewports, side by side. Headers: "Belief states" / "Next-token predictions".
 
-**Camera sharing**: one `OrbitControls` instance attached to a hidden "master" `PerspectiveCamera`. Each frame, copy `master.quaternion` and `master.position` to both visible cameras. Each visible camera has its own `fov` (slider or fixed difference) → independent zoom while rotation/translation stay locked. Always share, even when effective dims differ - seeing the token cloud edge-on *is* the signal that dim is smaller.
+**Camera sharing**: one `OrbitControls` instance attached to a hidden "master" `PerspectiveCamera`. Each frame, copy `master.quaternion` and `master.position` to both visible cameras. Each visible camera has its own `fov` (slider or fixed difference) → independent zoom while rotation/translation stay locked. Always share, even when effective dims differ - seeing the token cloud edge-on _is_ the signal that dim is smaller.
 
 **Points**: `THREE.Points` with `BufferGeometry`, size ~2px, opacity ~0.5, uniform color to start. Leave a hook for color-by-observation-history later.
 

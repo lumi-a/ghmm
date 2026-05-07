@@ -2,7 +2,7 @@ export function calculateProbability(
   T: number[][][],
   initial: number[],
   ws: number[],
-  phi?: number[]
+  phi?: number[],
 ): number {
   const n = initial.length;
   const p = phi ?? new Array(n).fill(1);
@@ -10,8 +10,7 @@ export function calculateProbability(
   for (const w of ws) {
     const next = new Array(n).fill(0);
     for (let j = 0; j < n; j++)
-      for (let k = 0; k < n; k++)
-        next[k] += state[j] * T[w][j][k];
+      for (let k = 0; k < n; k++) next[k] += state[j] * T[w][j][k];
     state = next;
   }
   return state.reduce((s, x, i) => s + x * p[i], 0);
@@ -21,33 +20,31 @@ export function beliefState(
   T: number[][][],
   initial: number[],
   phi: number[],
-  ws: number[]
+  ws: number[],
 ): number[] {
   const n = initial.length;
   let state = [...initial];
   for (const w of ws) {
     const next = new Array(n).fill(0);
     for (let j = 0; j < n; j++)
-      for (let k = 0; k < n; k++)
-        next[k] += state[j] * T[w][j][k];
+      for (let k = 0; k < n; k++) next[k] += state[j] * T[w][j][k];
     state = next;
   }
   const norm = state.reduce((s, x, i) => s + x * phi[i], 0);
   if (Math.abs(norm) < 1e-15) return state;
-  return state.map(x => x / norm);
+  return state.map((x) => x / norm);
 }
 
 export function tokenPrediction(
   T: number[][][],
   bs: number[],
-  phi: number[]
+  phi: number[],
 ): number[] {
   const n = bs.length;
-  return T.map(Tw => {
+  return T.map((Tw) => {
     let v = 0;
     for (let j = 0; j < n; j++)
-      for (let k = 0; k < n; k++)
-        v += bs[j] * Tw[j][k] * phi[k];
+      for (let k = 0; k < n; k++) v += bs[j] * Tw[j][k] * phi[k];
     return v;
   });
 }
@@ -67,7 +64,7 @@ export interface CloudResult {
 export function generateCloud(
   T: number[][][],
   initial: number[],
-  phi: number[]
+  phi: number[],
 ): CloudResult {
   const nObs = T.length;
   const depth = depthForObs(nObs);
@@ -90,7 +87,8 @@ export function generateCloud(
     const bs = beliefState(T, initial, phi, seq);
     const tp = tokenPrediction(T, bs, phi);
 
-    if (bs.some(x => x < -1e-9) || tp.some(x => x < -1e-9)) hasNegative = true;
+    if (bs.some((x) => x < -1e-9) || tp.some((x) => x < -1e-9))
+      hasNegative = true;
 
     beliefs.push(bs);
     tokens.push(tp);

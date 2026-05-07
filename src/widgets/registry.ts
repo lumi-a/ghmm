@@ -1,5 +1,5 @@
 export interface WidgetDecl {
-  kind: 'slider' | 'select' | 'toggle' | 'number';
+  kind: "slider" | "select" | "toggle" | "number";
   name: string;
   min?: number;
   max?: number;

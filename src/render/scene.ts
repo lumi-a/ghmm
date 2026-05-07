@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
 export interface SceneHandle {
   scene: THREE.Scene;
@@ -55,14 +55,18 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
   let posAttr: THREE.BufferAttribute | null = null;
   let alphaAttr: THREE.BufferAttribute | null = null;
 
-  function updatePoints(positions: Float32Array, alphas: Float32Array, n: number) {
+  function updatePoints(
+    positions: Float32Array,
+    alphas: Float32Array,
+    n: number,
+  ) {
     if (!posAttr || posAttr.array !== positions) {
       posAttr = new THREE.BufferAttribute(positions, 3);
-      pointsGeo.setAttribute('position', posAttr);
+      pointsGeo.setAttribute("position", posAttr);
     }
     if (!alphaAttr || alphaAttr.array !== alphas) {
       alphaAttr = new THREE.BufferAttribute(alphas, 1);
-      pointsGeo.setAttribute('aAlpha', alphaAttr);
+      pointsGeo.setAttribute("aAlpha", alphaAttr);
     }
     posAttr.needsUpdate = true;
     alphaAttr.needsUpdate = true;
@@ -74,11 +78,10 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     const edgePos: number[] = [];
     const nv = verts.length;
     for (let i = 0; i < nv; i++)
-      for (let j = i + 1; j < nv; j++)
-        edgePos.push(...verts[i], ...verts[j]);
+      for (let j = i + 1; j < nv; j++) edgePos.push(...verts[i], ...verts[j]);
     edgesGeo.setAttribute(
-      'position',
-      new THREE.BufferAttribute(new Float32Array(edgePos), 3)
+      "position",
+      new THREE.BufferAttribute(new Float32Array(edgePos), 3),
     );
   }
 

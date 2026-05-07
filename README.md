@@ -2,6 +2,7 @@
 
 Interactive visualizer for predictions in [Hidden Markov Models](https://en.wikipedia.org/wiki/Hidden_Markov_model).
 Given a generative process defined by observable operator matrices `T[observation, prev_state, next_state]`, we sample trajectories (with initial distribution `initial`). From the emitted observation of a trajectory:
+
 - For each state $S$ we compute the probability "Given the observations, how likely is it that I am currently in state $S$?", and
 - For each observation $\omega$ we compute "Given the observations so far, what is the probability that the next observation will be $\omega$?".
 
@@ -16,27 +17,34 @@ In state $S_0$, we have a 15% chance of transitioning to state $S_1$, a 10% chan
 We write these probabilities as a tensor: Given we are currently in state `state`, the probability of transitioning to `next_state` while emitting observation `obs` is `T[obs, state, next_state]`:
 
 ```js
-T = [[[0.48, 0.02, 0.02],  // Transition-matrix T[state, next_state]
-      [0.06, 0.16, 0.02],  // for observation o_0
-      [0.06, 0.02, 0.16]],
-    
-      [[0.16, 0.06, 0.02], // Transition-matrix T[state, next_state]
-      [0.02,  0.48, 0.02], // for observation o_1
-      [0.02,  0.06, 0.16]],
-    
-      [[0.16, 0.02, 0.06], // Transition-matrix T[state, next_state]
-      [0.02,  0.16, 0.06], // for observation o_2
-      [0.02,  0.02, 0.48]]]
+T = [
+  [
+    [0.48, 0.02, 0.02], // Transition-matrix T[state, next_state]
+    [0.06, 0.16, 0.02], // for observation o_0
+    [0.06, 0.02, 0.16],
+  ],
+
+  [
+    [0.16, 0.06, 0.02], // Transition-matrix T[state, next_state]
+    [0.02, 0.48, 0.02], // for observation o_1
+    [0.02, 0.06, 0.16],
+  ],
+
+  [
+    [0.16, 0.02, 0.06], // Transition-matrix T[state, next_state]
+    [0.02, 0.16, 0.06], // for observation o_2
+    [0.02, 0.02, 0.48],
+  ],
+];
 ```
 
-For example, when we are in state $S_0$ and want to know what the probability of transitioning to $S_1$ (which, on its own, has probability 10%) is while falsely emitting $o_2$ (this false emission has a probability of happening 20% of the time, so 10%*20% = 0.02), we look at the third matrix (responsible for $o_2$-emissions), the first row (current state $S_0$) and second column (target state $S_1$).
+For example, when we are in state $S_0$ and want to know what the probability of transitioning to $S_1$ (which, on its own, has probability 10%) is while falsely emitting $o_2$ (this false emission has a probability of happening 20% of the time, so 10%\*20% = 0.02), we look at the third matrix (responsible for $o_2$-emissions), the first row (current state $S_0$) and second column (target state $S_1$).
 
 When the initial distribution is set to uniform (i.e. the states $S_0, S_1, S_2$ are all equally likely), we obtain this plot.
 
 ![A fractal rendering of the above Mess3 process](mess3-0.1-0.6.png)
 
 If the matrices do not sum to [row-stochastic-matrices](https://en.wikipedia.org/wiki/Stochastic_matrix), the code still functions (mostly) fine, as prediction is (mostly) just matrix multiplication. This is a _Generalised_ Hidden Markov Model. The status badge at the bottom right shows you how ill-posed your `T` is.
-
 
 ## Purpose
 

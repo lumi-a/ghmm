@@ -1,17 +1,21 @@
-import { EditorView, basicSetup } from 'codemirror';
-import { javascript } from '@codemirror/lang-javascript';
+import { EditorView, basicSetup } from "codemirror";
+import { javascript } from "@codemirror/lang-javascript";
 
 const darkTheme = EditorView.theme(
   {
-    '&': { background: '#111', color: '#ddd', height: '100%' },
-    '.cm-scroller': { overflow: 'auto' },
-    '.cm-gutters': { background: '#1a1a1a', borderRight: '1px solid #333', color: '#555' },
-    '.cm-activeLineGutter': { background: '#1e1e1e' },
-    '.cm-activeLine': { background: '#1e1e1e' },
-    '.cm-cursor': { borderLeftColor: '#4488ff' },
-    '.cm-selectionBackground': { background: '#2a4a6a !important' },
+    "&": { background: "#111", color: "#ddd", height: "100%" },
+    ".cm-scroller": { overflow: "auto" },
+    ".cm-gutters": {
+      background: "#1a1a1a",
+      borderRight: "1px solid #333",
+      color: "#555",
+    },
+    ".cm-activeLineGutter": { background: "#1e1e1e" },
+    ".cm-activeLine": { background: "#1e1e1e" },
+    ".cm-cursor": { borderLeftColor: "#4488ff" },
+    ".cm-selectionBackground": { background: "#2a4a6a !important" },
   },
-  { dark: true }
+  { dark: true },
 );
 
 export interface EditorHandle {
@@ -22,7 +26,7 @@ export interface EditorHandle {
 export function setupEditor(
   container: HTMLElement,
   initialCode: string,
-  onChange: (code: string) => void
+  onChange: (code: string) => void,
 ): EditorHandle {
   const view = new EditorView({
     doc: initialCode,
@@ -30,7 +34,7 @@ export function setupEditor(
       basicSetup,
       javascript(),
       darkTheme,
-      EditorView.updateListener.of(update => {
+      EditorView.updateListener.of((update) => {
         if (update.docChanged) onChange(view.state.doc.toString());
       }),
     ],

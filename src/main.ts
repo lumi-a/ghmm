@@ -62,7 +62,10 @@ function addViewportFov(bodyEl: HTMLElement, camera: THREE.PerspectiveCamera) {
     (e) => {
       e.preventDefault();
       e.stopPropagation();
-      camera.fov = Math.max(0.01, Math.min(170, camera.fov * Math.exp(e.deltaY * 0.002)));
+      camera.fov = Math.max(
+        0.01,
+        Math.min(170, camera.fov * Math.exp(e.deltaY * 0.002)),
+      );
       camera.updateProjectionMatrix();
     },
     { passive: false },
@@ -91,7 +94,7 @@ function addViewportFov(bodyEl: HTMLElement, camera: THREE.PerspectiveCamera) {
         e.touches[0].clientY - e.touches[1].clientY,
       );
       if (lastDist > 0) {
-        camera.fov = Math.max(1, Math.min(170,camera.fov * (lastDist / d)));
+        camera.fov = Math.max(1, Math.min(170, camera.fov * (lastDist / d)));
         camera.updateProjectionMatrix();
       }
       lastDist = d;
@@ -103,14 +106,8 @@ function addViewportFov(bodyEl: HTMLElement, camera: THREE.PerspectiveCamera) {
   });
 }
 
-addViewportFov(
-  document.querySelector("#vp-belief .vp-body"),
-  cam.beliefCam,
-);
-addViewportFov(
-  document.querySelector("#vp-token  .vp-body"),
-  cam.tokenCam,
-);
+addViewportFov(document.querySelector("#vp-belief .vp-body"), cam.beliefCam);
+addViewportFov(document.querySelector("#vp-token  .vp-body"), cam.tokenCam);
 
 // ── Presets ───────────────────────────────────────────────────────────────────
 PRESETS.forEach((preset, idx) => {
@@ -127,7 +124,7 @@ presetSelect.addEventListener("change", () => {
 });
 
 // ── Editor ────────────────────────────────────────────────────────────────────
-const defaultPresetIdx = PRESETS.findIndex(p => p.name === "Mess4");
+const defaultPresetIdx = PRESETS.findIndex((p) => p.name === "Mess4");
 const defaultPreset = PRESETS[defaultPresetIdx < 0 ? 0 : defaultPresetIdx];
 presetSelect.value = String(defaultPresetIdx);
 const editor = setupEditor(editorWrap, defaultPreset.code, (code) => {
@@ -173,7 +170,6 @@ function runUpdate() {
     showError(e.message);
     return;
   }
-
 
   beliefScene.updateEdges(beliefVerts);
   tokenScene.updateEdges(tokenVerts);
@@ -298,7 +294,6 @@ function loop(now: number) {
 
   beliefScene.render(cam.beliefCam);
   tokenScene.render(cam.tokenCam);
-
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
