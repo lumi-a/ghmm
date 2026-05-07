@@ -1,6 +1,5 @@
 function matmul(A: number[][], B: number[][]): number[][] {
   const m = A.length,
-    k = A[0].length,
     n = B[0].length;
   return Array.from({ length: m }, (_, i) =>
     Array.from({ length: n }, (_, j) =>

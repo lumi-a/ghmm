@@ -28,7 +28,6 @@ export function sumT(T: number[][][]): number[][] {
 export function computePhi(
   T: number[][][],
   initial: number[],
-  tol = 1e-9,
 ): PhiResult {
   const Ttotal = sumT(T);
   const n = Ttotal.length;

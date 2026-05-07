@@ -16,10 +16,6 @@ export function togglePlay(name: string): void {
   }
 }
 
-export function stopAll(): void {
-  playing.clear();
-}
-
 export function advanceAnimations(
   decls: WidgetDecl[],
   state: WidgetState,
