@@ -77,8 +77,8 @@ const initial = np.array([1/3, 1/3, 1/3]);
     name: "Mess4",
     code: `\
 // Mess4 - 4 states, 4 obs
-const x = slider('x', 0, 1/3, 0.15);
-const a = slider('a', 0, 1, 0.2);
+const x = slider('x', 0, 1/3, 0.1);
+const a = slider('a', 0, 1, 0.6);
 const b = (1 - a) / 3;
 const y = 1 - 3 * x;
 const ay = a*y, bx = b*x, by = b*y, ax = a*x;
