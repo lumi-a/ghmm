@@ -122,6 +122,7 @@ PRESETS.forEach((preset, idx) => {
 
 presetSelect.addEventListener("change", () => {
   const preset = PRESETS[Number(presetSelect.value)];
+  widgetState.values.clear();
   editor.setValue(preset.code);
 });
 

@@ -117,7 +117,11 @@ function buildWidget(
 function refreshWidget(el: HTMLElement, decl: WidgetDecl, state: WidgetState) {
   if (decl.kind === 'slider') {
     const input = el.querySelector<HTMLInputElement>('input[type=range]');
-    if (input && document.activeElement !== input) {
+    if (!input) return;
+    input.min = String(decl.min);
+    input.max = String(decl.max);
+    input.step = decl.step != null ? String(decl.step) : '0.001';
+    if (document.activeElement !== input) {
       const v = String(state.values.get(decl.name) ?? decl.def);
       input.value = v;
       const valSpan = el.querySelector<HTMLSpanElement>('.widget-value');
