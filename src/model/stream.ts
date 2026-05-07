@@ -56,7 +56,7 @@ export class CloudStreamer {
   private sample: (tp: number[]) => number = () => 0;
   private readonly maxPoints: number;
 
-  constructor(maxPoints = 3000) {
+  constructor(maxPoints = 8192) {
     this.maxPoints = maxPoints;
     this.beliefBuf = new Float32Array(maxPoints * 3);
     this.tokenBuf = new Float32Array(maxPoints * 3);
@@ -79,12 +79,11 @@ export class CloudStreamer {
     this.curState = [...this.initialState];
   }
 
-  tick(budgetMs = 5): void {
+  tick(): void {
     if (this.T.length === 0 || this.count >= this.maxPoints) return;
-    const deadline = performance.now() + budgetMs;
     const n = this.curState.length;
 
-    while (performance.now() < deadline && this.count < this.maxPoints) {
+    while (this.count < this.maxPoints) {
       const tp = tokenPrediction(this.T, this.curState, this.phi);
 
       if (this.curState.some(x => x < -1e-9) || tp.some(x => x < -1e-9))

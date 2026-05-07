@@ -53,7 +53,7 @@ let evalTimer: ReturnType<typeof setTimeout> | null = null;
 const beliefScene = createScene(canvasBelief);
 const tokenScene = createScene(canvasToken);
 const cam = setupCamera(document.getElementById("viewports") as HTMLElement);
-const streamer = new CloudStreamer(65535);
+const streamer = new CloudStreamer();
 
 // ── Per-viewport FOV (scroll wheel / pinch) ───────────────────────────────────
 function addViewportFov(bodyEl: HTMLElement, camera: THREE.PerspectiveCamera) {
